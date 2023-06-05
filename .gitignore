@@ -1,6 +1,5 @@
-.DS_Store
-
 bin/**
+!bin/*.json
 build/**
 .vs/**
 !.vs/CMake Overview
