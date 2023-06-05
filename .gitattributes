@@ -1,0 +1,10 @@
+* text=auto
+
+*.cpp      text diff=cpp
+*.hpp      text diff=cpp
+*.cmake    text
+*.yml      text
+*.json     text
+*.toml     text
+*.md       text
+Dockerfile text

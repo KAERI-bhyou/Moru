@@ -1,0 +1,5 @@
+file(
+  GLOB_RECURSE
+    MAGI_SRC CONFIGURE_DEPENDS
+      ${CMAKE_CURRENT_SOURCE_DIR}/src/io/read_yaml.cpp
+)

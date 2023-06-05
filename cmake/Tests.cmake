@@ -1,0 +1,39 @@
+if(MAGI_TEST)
+enable_testing()
+include(GoogleTest)
+
+add_executable(test_hello test/rng.cpp)
+target_sources(
+    test_hello
+        PRIVATE
+            ${magi_src}
+)
+target_include_directories(
+    test_hello
+        PRIVATE
+            ${MAGI_INCLUDE_DIR}
+)
+target_link_libraries(
+    test_hello
+        PRIVATE
+            ${MAGI_LINK_LIBRARY}
+            GTest::gtest_main
+)
+target_compile_features(
+    test_hello
+        PRIVATE
+            cxx_std_20
+)
+target_compile_options(
+    test_hello
+        PRIVATE
+            ${MAGI_COMPILE_OPTION}
+)
+set_target_properties(
+    test_hello
+        PROPERTIES
+            ${MAGI_PROPERTY}
+)
+
+gtest_discover_tests(test_hello)
+endif()
