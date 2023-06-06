@@ -22,8 +22,8 @@
             "inherits": "Project-Base",
             "cacheVariables": {
                 "CMAKE_CXX_COMPILER": "icx.exe",
-                "VCPKG_TARGET_TRIPLET": "x64-windows",
-                "VCPKG_HOST_TRIPLET": "x64-windows"
+                "VCPKG_TARGET_TRIPLET": "x64-windows-static",
+                "VCPKG_HOST_TRIPLET": "x64-windows-static"
             }
         },
         {

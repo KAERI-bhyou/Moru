@@ -1,27 +1,42 @@
 #include <iostream>
-#include <spdlog/spdlog.h>
-#include "io/config.hpp"
-#include "boost/program_options.hpp"
+#include <fstream>
+#include <sstream>
 
-using Json = nlohmann::json;
+#include <boost/json.hpp>
+#include <boost/program_options.hpp>
+
+#include "io/config.hpp"
 
 std::string arg_parse( int, char*[] );
 
 int main( int argc, char* argv[] )
 {
-    spdlog::info( "First Run" );
+    namespace json = boost::json;
+
     std::string filename = arg_parse( argc, argv );
 
-    Maru::Config config;
+    auto ss = std::ostringstream{};
+    std::ifstream input_file( filename );
+    if( !input_file.is_open() )
+    {
+        std::cerr << "Could not open the file - '"
+                  << filename << "'" << std::endl;
+        exit( EXIT_FAILURE );
+    }
+    ss << input_file.rdbuf();
 
-    auto yaml = fs::current_path() / filename;
+    json::error_code ec;
+    json::monotonic_resource mr;
+    json::parse_options opt;
+    opt.allow_comments = true;
+    opt.allow_trailing_commas = true;
 
-    std::ifstream ifs( filename );
+    json::value jv = json::parse( ss.str(), ec, &mr, opt );
 
-    Json json = Json::parse( ifs, nullptr, true, true );
-    auto c = json.get<Maru::Config>();
+    Moru::Config config( json::value_to<Moru::Config>( jv ) );
 
-    std::cout << json;
+    std::cout << jv << std::endl;
+    std::cout << ec.what() << std::endl;
 }
 
 std::string arg_parse( int argc, char* argv[] )

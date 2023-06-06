@@ -1,75 +1,75 @@
 {
-    "title": "Just Normal Calculation",
-    "author": "Byung-Hyun You",
-    "email": "bhyou@kaeri.re.kr",
-    "description": "Test runs of SUBO experiment for both SPACE and CUPID code.\n",
-    // "options": {
-    //   "concurrent_jos": 4
-    // },
-    "jobs": [
-      {
-        "job_name": "space_runs",
-        "codes": "space",
-        "inputs": "subo_s",
-        "workflow": "reference_run"
-      },
-      {
-        "job_name": "cupid_runs",
-        "codes": "cupid",
-        "inputs": "subo_c",
-        "workflow": "reference_run"
-      },
-      {
-        "job_name": "hybrid",
-        "codes": [
-          "space",
-          "cupid"
-        ],
-        "inputs": "combined",
-        "workflow": "reference_run",
-        "coupling_method": "auto"
-      }
-    ],
-    "codes": {
-      "space": {
-        "name": "space",
-        "binary": "space.exe",
-        "dependencies": "waterproperty.dat",
-        "path": "C:/codes",
-        "np": 1
-      },
-      "cupid": {
-        "name": "cupid",
-        "binary": "cupid.exe",
-        "dependencies": "tpfh2o",
-        "path": "C:/codes",
-        "np": 4
-      }
+  "title": "Just Normal Calculation",
+  "author": "Byung-Hyun You",
+  "email": "bhyou@kaeri.re.kr",
+  //"description": "Test runs of SUBO experiment for both SPACE and CUPID code.",
+  // "options": {
+  //   "concurrent_jos": 4
+  // },
+  "jobs": [
+    {
+      "job_name": "space_runs",
+      "codes": "space",
+      "inputs": "subo_s",
+      "workflow": "reference_run"
     },
-    "inputs": {
-      "subo_s": {
-        "files": [
-          "space_input_1.in",
-          "space_input_2.in",
-          "space_input_3.in"
-        ]
-      },
-      "subo_c": {
-        "files": [
-          "cupid_input_1.in",
-          "cupid_input_2.in"
-        ]
-      },
-      "combined": {
-        "files": [
-          "space_input_1.in",
-          "cupid_input_1.in"
-        ]
-      }
+    {
+      "job_name": "cupid_runs",
+      "codes": "cupid",
+      "inputs": "subo_c",
+      "workflow": "reference_run"
     },
-    "workflows": {
-      "reference_run": {
-        "1": "execution"
-      }
+    {
+      "job_name": "hybrid",
+      "codes": [
+        "space",
+        "cupid"
+      ],
+      "inputs": "combined",
+      "workflow": "reference_run",
+      "coupling_method": "auto"
+    }
+  ],
+  "codes": {
+    "space": {
+      "name": "space",
+      "binary": "space.exe",
+      "dependencies": "waterproperty.dat",
+      "path": "C:/codes",
+      "np": 1
+    },
+    "cupid": {
+      "name": "cupid",
+      "binary": "cupid.exe",
+      "dependencies": "tpfh2o",
+      "path": "C:/codes",
+      "np": 4
+    }
+  },
+  "inputs": {
+    "subo_s": {
+      "files": [
+        "space_input_1.in",
+        "space_input_2.in",
+        "space_input_3.in"
+      ]
+    },
+    "subo_c": {
+      "files": [
+        "cupid_input_1.in",
+        "cupid_input_2.in"
+      ]
+    },
+    "combined": {
+      "files": [
+        "space_input_1.in",
+        "cupid_input_1.in"
+      ]
+    }
+  },
+  "workflows": {
+    "reference_run": {
+      "1": "execution"
     }
   }
+}

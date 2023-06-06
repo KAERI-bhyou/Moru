@@ -16,6 +16,7 @@
         "tslint.json": "jsonc",
         "*.in": "jade",
         "*.i": "jade",
+        "*.json": "jsonc",
         "algorithm": "cpp",
         "*.tcc": "cpp",
         "optional": "cpp",
@@ -119,6 +120,11 @@
         "cinttypes": "cpp",
         "source_location": "cpp",
         "csignal": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "csetjmp": "cpp",
+        "execution": "cpp",
+        "hash_map": "cpp",
+        "hash_set": "cpp",
+        "scoped_allocator": "cpp"
     }
 }

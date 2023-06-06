@@ -9,11 +9,12 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Intel")
     if(WIN32)
         set(MAGI_DEFAULT_COMPILE_OPTION
             "/fp:strict"
+            "-Wno-deprecated-builtins"
         )
         set(MAGI_DEFAULT_PROPERTY
             CXX_EXTENSIONS OFF
             RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin
-            # MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+            MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
         )
         if(CMAKE_BUILD_TYPE STREQUAL "Debug")
             set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /DEBUG:FULL /INCREMENTAL:NO /MANIFEST:NO")
