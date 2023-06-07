@@ -2,7 +2,7 @@
   "title": "Just Normal Calculation",
   "author": "Byung-Hyun You",
   "email": "bhyou@kaeri.re.kr",
-  //"description": "Test runs of SUBO experiment for both SPACE and CUPID code.",
+  "description": "Test runs of SUBO experiment for both SPACE and CUPID code.",
   // "options": {
   //   "concurrent_jos": 4
   // },
@@ -10,64 +10,74 @@
     {
       "job_name": "space_runs",
       "codes": "space",
-      "inputs": "subo_s",
+      "inputs": [
+        "subo_space"
+      ],
+      "restart": false,
       "workflow": "reference_run"
     },
     {
       "job_name": "cupid_runs",
       "codes": "cupid",
-      "inputs": "subo_c",
+      "inputs": [
+        "subo_cupid_flow",
+        "subo_cupid_grid"
+      ],
+      "restart": false,
       "workflow": "reference_run"
     },
-    {
-      "job_name": "hybrid",
-      "codes": [
-        "space",
-        "cupid"
-      ],
-      "inputs": "combined",
-      "workflow": "reference_run",
-      "coupling_method": "auto"
-    }
+    // {
+    //   "job_name": "hybrid",
+    //   "codes": [
+    //     "space",
+    //     "cupid"
+    //   ],
+    //   "input": "combined",
+    //   "workflow": "reference_run",
+    //   "coupling_method": "auto"
+    // }
   ],
-  "codes": {
-    "space": {
+  "codes": [
+    {
       "name": "space",
-      "binary": "space.exe",
-      "dependencies": "waterproperty.dat",
-      "path": "C:/codes",
+      "executable": "codes/space/space.exe",
+      "dependencies": [
+        "codes/space/waterproperty.dat"
+      ],
       "np": 1
     },
-    "cupid": {
+    {
       "name": "cupid",
-      "binary": "cupid.exe",
-      "dependencies": "tpfh2o",
-      "path": "C:/codes",
+      "executable": "codes/cupid/cupid.exe",
+      "dependencies": [
+        "codes/cupid/tpfh2o"
+      ],
       "np": 4
     }
-  },
-  "inputs": {
-    "subo_s": {
-      "files": [
-        "space_input_1.in",
-        "space_input_2.in",
-        "space_input_3.in"
-      ]
+  ],
+  "inputs": [
+    {
+      "name": "subo_space",
+      "file": "samples/space_input.in"
     },
-    "subo_c": {
-      "files": [
-        "cupid_input_1.in",
-        "cupid_input_2.in"
-      ]
+    {
+      "name": "subo_space_rst",
+      "file": "samples/space_input.rst"
     },
-    "combined": {
-      "files": [
-        "space_input_1.in",
-        "cupid_input_1.in"
-      ]
+    {
+      "name": "subo_space_rst_out",
+      "file": "samples/space_input.rst_out"
+    },
+    {
+      "name": "subo_cupid_flow",
+      "file": "samples/somaFlow.in"
+    },
+    {
+      "name": "subo_cupid_grid",
+      "file": "samples/somaGrid.in"
     }
-  },
-  "workflows": {
+  ],
+  "modules": {
     "reference_run": {
       "1": "execution"
     }

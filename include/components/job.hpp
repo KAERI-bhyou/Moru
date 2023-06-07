@@ -3,9 +3,9 @@
 
 #include <string>
 #include <vector>
-#include "component/code.hpp"
-#include "component/input.hpp"
-#include "component/workflow.hpp"
+#include "components/code.hpp"
+#include "components/input.hpp"
+#include "components/workflow.hpp"
 
 class Job
 {
