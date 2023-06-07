@@ -6,8 +6,8 @@
 #include <iostream>
 #include <string>
 #include <string_view>
-#include <boost/process.hpp>
-#include <boost/json.hpp>
+#include <vector>
+#include <nlohmann/json.hpp>
 
 #include "components/code.hpp"
 #include "components/input.hpp"
@@ -30,13 +30,32 @@ namespace Moru
         std::vector<Workflow> workflows;
     };
 
-    template <class T>
-    void extract( boost::json::object const& obj, T& t, boost::json::string_view key )
+    // NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Config, title, author, email, description)
+
+    inline void to_json( nlohmann::json& j, const Config& config )
     {
-        t = boost::json::value_to<T>( obj.at( key ) );
     }
 
-    Config tag_invoke( boost::json::value_to_tag<Config>, boost::json::value const& jv );
+    inline void from_json( const nlohmann::json& j, Config& config )
+    {
+        if( j.contains( "title" ) )
+            j.at( "title" ).get_to( config.title );
+
+        if( j.contains( "author" ) )
+            j.at( "author" ).get_to( config.author );
+
+        if( j.contains( "email" ) )
+            j.at( "email" ).get_to( config.email );
+
+        if( j.contains( "description" ) )
+            j.at( "description" ).get_to( config.description );
+
+        if( j.contains( "codes" ) )
+            j.at( "codes" ).get_to<std::vector<Code>>( config.codes );
+
+        if( j.contains( "inputs" ) )
+            j.at( "inputs" ).get_to<std::vector<Input>>( config.inputs );
+    }
 } // namespace Moru
 
 #endif /* C5FDD5D9_FCF3_42E2_8C67_4E2B06DC5D83 */

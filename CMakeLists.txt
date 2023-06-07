@@ -29,12 +29,10 @@ target_compile_definitions(
     ${target}
         PRIVATE
             _WIN32_WINNT=0x0601
-            FMT_HEADER_ONLY
 )
 target_link_directories(
     ${target}
         PRIVATE
-            ${Boost_LIBRARY_DIRS}
 )
 target_link_libraries(
     ${target}

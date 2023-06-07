@@ -9,7 +9,7 @@
   "jobs": [
     {
       "job_name": "space_runs",
-      "codes": "space",
+      "code": "space",
       "inputs": [
         "subo_space"
       ],
@@ -18,14 +18,14 @@
     },
     {
       "job_name": "cupid_runs",
-      "codes": "cupid",
+      "code": "cupid",
       "inputs": [
         "subo_cupid_flow",
         "subo_cupid_grid"
       ],
       "restart": false,
       "workflow": "reference_run"
-    },
+    }
     // {
     //   "job_name": "hybrid",
     //   "codes": [

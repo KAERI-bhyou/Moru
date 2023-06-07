@@ -1,60 +1,67 @@
 #include <iostream>
-#include <fstream>
-#include <sstream>
-
-#include <boost/json.hpp>
-#include <boost/program_options.hpp>
+#include <string_view>
+#include <spdlog/spdlog.h>
+#include <mpi.h>
 
 #include "utils/config.hpp"
 
-std::string arg_parse( int, char*[] );
-
 int main( int argc, char* argv[] )
 {
-    namespace json = boost::json;
+    MPI_Init( &argc, &argv );
 
-    std::string filename = arg_parse( argc, argv );
+    int rank, size;
+    MPI_Comm_rank( MPI_COMM_WORLD, &rank );
+    MPI_Comm_size( MPI_COMM_WORLD, &size );
 
-    auto ss = std::ostringstream{};
-    std::ifstream input_file( filename );
-    if( !input_file.is_open() )
+    const std::vector<std::string_view> args( argv + 1, argv + argc );
+    std::string filename{};
+
+    for( auto i = 0; i < argc - 1; ++i )
     {
-        std::cerr << "Could not open the file - '"
-                  << filename << "'" << std::endl;
-        exit( EXIT_FAILURE );
-    }
-    ss << input_file.rdbuf();
-
-    json::error_code ec;
-    json::monotonic_resource mr;
-    json::parse_options opt;
-    opt.allow_comments = true;
-    opt.allow_trailing_commas = true;
-
-    json::value jv = json::parse( ss.str(), ec, &mr, opt );
-
-    Moru::Config config( json::value_to<Moru::Config>( jv ) );
-
-    std::cout << jv << std::endl;
-    std::cout << ec.what() << std::endl;
-}
-
-std::string arg_parse( int argc, char* argv[] )
-{
-    namespace po = boost::program_options;
-
-    po::options_description desc( "all options" );
-    desc.add_options()( "input,i", po::value<std::string>()->default_value( "workflow-reference.json" ), "Input file name." )( "output,o", po::value<std::string>()->default_value( "output.log" ), "Output file name." )( "version,v", po::value<std::string>(), "0.1.0" )( "help,h", "produce help message" );
-
-    po::variables_map vm;
-    po::store( po::parse_command_line( argc, argv, desc ), vm );
-    po::notify( vm );
-
-    if( vm.count( "help" ) )
-    {
-        std::cout << desc << "\n";
-        std::exit( -1 );
+        if( args[ i ] == "-i" || args[ i ] == "--input" )
+        {
+            filename = args[ i + 1 ];
+        }
+        if( args[ i ] == "-h" || args[ i ] == "--help" )
+        {
+            std::cout << "" << '\n';
+            std::cout << "" << '\n';
+            std::cout << "" << '\n';
+            std::cout << "" << '\n';
+            std::cout << "" << '\n';
+            std::cout << "" << '\n';
+            std::exit( 0 );
+        }
     }
 
-    return vm[ "input" ].as<std::string>();
+    std::ifstream config_file( filename );
+
+    nlohmann::json config_json;
+
+    try
+    {
+        config_json = nlohmann::json::parse( config_file, nullptr, false, true );
+    }
+    catch( nlohmann::json::exception& ec )
+    {
+        spdlog::error( "{}", ec.what() );
+    }
+
+    config_file.close();
+    Moru::Config config = config_json;
+
+    spdlog::info( "{}", config_json.dump() );
+
+    // int childMessage;
+    // MPI_Status status;
+
+    // MPI_Comm childComm;
+    // MPI_Comm_spawn( "./child_process", MPI_ARGV_NULL, 1, MPI_INFO_NULL, 0, MPI_COMM_SELF, &childComm, MPI_ERRCODES_IGNORE );
+    // MPI_Recv( &childMessage, 1, MPI_INT, MPI_ANY_SOURCE, MPI_ANY_TAG, childComm, &status );
+    // std::cout << "Received message from child process: " << childMessage << std::endl;
+    // MPI_Comm_disconnect( &childComm );
+
+    MPI_Finalize();
+
+    return 0;
 }

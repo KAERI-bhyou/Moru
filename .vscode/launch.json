@@ -7,11 +7,14 @@
             "preLaunchTask": "",
             "postDebugTask": "",
             "program": "${command:cmake.launchTargetPath}",
-            "args": [ "-i", "workflow-reference.json" ],
+            "args": [
+                "-i",
+                "workflow-reference.json"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/bin",
             "environment": [],
-            "console": "externalTerminal",
+            "console": "newExternalWindow",
         },
         {
             "name": "launch-linux",
