@@ -4,6 +4,10 @@
 #include <mpi.h>
 
 #include "utils/config.hpp"
+#include "utils/runner.hpp"
+
+#include "modules/sampler.hpp"
+
 
 int main( int argc, char* argv[] )
 {
@@ -52,16 +56,22 @@ int main( int argc, char* argv[] )
 
     spdlog::info( "{}", config_json.dump() );
 
-    // int childMessage;
-    // MPI_Status status;
+    int childMessage;
+    MPI_Status status;
 
-    // MPI_Comm childComm;
-    // MPI_Comm_spawn( "./child_process", MPI_ARGV_NULL, 1, MPI_INFO_NULL, 0, MPI_COMM_SELF, &childComm, MPI_ERRCODES_IGNORE );
-    // MPI_Recv( &childMessage, 1, MPI_INT, MPI_ANY_SOURCE, MPI_ANY_TAG, childComm, &status );
-    // std::cout << "Received message from child process: " << childMessage << std::endl;
-    // MPI_Comm_disconnect( &childComm );
+    MPI_Comm childComm;
+    MPI_Comm_spawn( "C:/Users/lambda/Desktop/space/bin/space.exe", MPI_ARGV_NULL, 1, MPI_INFO_NULL, 0, MPI_COMM_SELF, &childComm, MPI_ERRCODES_IGNORE );
+    MPI_Recv( &childMessage, 1, MPI_INT, MPI_ANY_SOURCE, MPI_ANY_TAG, childComm, &status );
+    std::cout << "Received message from child process: " << childMessage << std::endl;
+    MPI_Comm_disconnect( &childComm );
 
     MPI_Finalize();
+
+    Moru::runner();
+
+    LogNormalDist lnd;
+
+    lnd.run();
 
     return 0;
 }
