@@ -11,8 +11,9 @@
 
 #include "components/code.hpp"
 #include "components/input.hpp"
-#include "components/job.hpp"
 #include "components/workflow.hpp"
+
+#include "modules/sampler.hpp"
 
 namespace Moru
 {
@@ -24,9 +25,9 @@ namespace Moru
         std::string email;
         std::string description;
 
-        std::vector<Job> jobs_;
         std::vector<Code> codes;
         std::vector<Input> inputs;
+        std::vector<Sampler> samplers;
         std::vector<Workflow> workflows;
     };
 
@@ -55,6 +56,9 @@ namespace Moru
 
         if( j.contains( "inputs" ) )
             j.at( "inputs" ).get_to<std::vector<Input>>( config.inputs );
+
+        if( j.contains( "samplers" ) )
+            j.at( "samplers" ).get_to<std::vector<Sampler>>( config.samplers );
     }
 } // namespace Moru
 

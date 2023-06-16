@@ -42,7 +42,7 @@
       "name": "space",
       "executable": "codes/space/space.exe",
       "dependencies": [
-        "codes/space/waterproperty.dat"
+        // "codes/space/waterproperty.dat"
       ],
       "np": 1
     },
@@ -58,23 +58,15 @@
   "inputs": [
     {
       "name": "subo_space",
-      "file": "samples/space_input.in"
-    },
-    {
-      "name": "subo_space_rst",
-      "file": "samples/space_input.rst"
-    },
-    {
-      "name": "subo_space_rst_out",
-      "file": "samples/space_input.rst_out"
+      "file": "input/sample.in"
     },
     {
       "name": "subo_cupid_flow",
-      "file": "samples/somaFlow.in"
+      "file": "input/somaFlow.in"
     },
     {
       "name": "subo_cupid_grid",
-      "file": "samples/somaGrid.in"
+      "file": "input/somaGrid.in"
     }
   ],
   "modules": {

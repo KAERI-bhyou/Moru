@@ -1,4 +1,4 @@
-if(MAGI_TEST)
+if(MORU_TEST)
 enable_testing()
 include(GoogleTest)
 
@@ -6,17 +6,17 @@ add_executable(test_hello test/rng.cpp)
 target_sources(
     test_hello
         PRIVATE
-            ${magi_src}
+            ${MORU_src}
 )
 target_include_directories(
     test_hello
         PRIVATE
-            ${MAGI_INCLUDE_DIR}
+            ${MORU_INCLUDE_DIR}
 )
 target_link_libraries(
     test_hello
         PRIVATE
-            ${MAGI_LINK_LIBRARY}
+            ${MORU_LINK_LIBRARY}
             GTest::gtest_main
 )
 target_compile_features(
@@ -27,12 +27,12 @@ target_compile_features(
 target_compile_options(
     test_hello
         PRIVATE
-            ${MAGI_COMPILE_OPTION}
+            ${MORU_COMPILE_OPTION}
 )
 set_target_properties(
     test_hello
         PROPERTIES
-            ${MAGI_PROPERTY}
+            ${MORU_PROPERTY}
 )
 
 gtest_discover_tests(test_hello)

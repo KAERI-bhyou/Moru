@@ -16,7 +16,7 @@ find_package(nlohmann_json CONFIG REQUIRED)
 find_path(EXPRTK_INCLUDE_DIRS "exprtk.hpp")
 find_path(IF97_INCLUDE_DIRS "IF97.h")
 
-set(MAGI_INCLUDE_DIR
+set(MORU_INCLUDE_DIR
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${EXPRTK_INCLUDE_DIRS}
     ${IF97_INCLUDE_DIRS}
@@ -26,7 +26,7 @@ set(MAGI_INCLUDE_DIR
     TBB::tbb
 )
 
-set(MAGI_LINK_LIBRARY
+set(MORU_LINK_LIBRARY
     OpenMP::OpenMP_CXX
     MPI::MPI_CXX
     MKL::MKL

@@ -4,10 +4,9 @@
 #include <mpi.h>
 
 #include "utils/config.hpp"
-#include "utils/runner.hpp"
+#include "utils/worker.hpp"
 
 #include "modules/sampler.hpp"
-
 
 int main( int argc, char* argv[] )
 {
@@ -67,11 +66,6 @@ int main( int argc, char* argv[] )
 
     MPI_Finalize();
 
-    Moru::runner();
-
-    LogNormalDist lnd;
-
-    lnd.run();
 
     return 0;
 }

@@ -18,12 +18,12 @@ add_executable(
 target_sources(
     ${target}
         PRIVATE
-            ${MAGI_SRC}
+            ${MORU_SRC}
 )
 target_include_directories(
     ${target}
         PRIVATE
-            ${MAGI_INCLUDE_DIR}
+            ${MORU_INCLUDE_DIR}
 )
 target_compile_definitions(
     ${target}
@@ -37,7 +37,7 @@ target_link_directories(
 target_link_libraries(
     ${target}
         PRIVATE
-            ${MAGI_LINK_LIBRARY}
+            ${MORU_LINK_LIBRARY}
 )
 target_compile_features(
     ${target}
@@ -47,10 +47,10 @@ target_compile_features(
 target_compile_options(
     ${target}
         PRIVATE
-            ${MAGI_COMPILE_OPTION}
+            ${MORU_COMPILE_OPTION}
 )
 set_target_properties(
     ${target}
         PROPERTIES
-            ${MAGI_PROPERTY}
+            ${MORU_PROPERTY}
 )
