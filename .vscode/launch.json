@@ -9,7 +9,7 @@
             "program": "${command:cmake.launchTargetPath}",
             "args": [
                 "-i",
-                "workflow-reference.json"
+                "workflow-test.json"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/bin",

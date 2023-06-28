@@ -4,3 +4,4 @@ build/**
 .vs/**
 !.vs/CMake Overview
 !.vs/launch.vs.json
+test/**

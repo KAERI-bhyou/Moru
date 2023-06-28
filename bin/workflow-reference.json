@@ -6,90 +6,42 @@
   // "options": {
   //   "parallel": "4"
   // },
-  "workflow": {},
-  "jobs": [
-    {
-      "job_name": "space_runs",
-      "code": "space",
-      "inputs": [
-        "subo_space"
-      ],
-      "restart": false,
-      "workflow": "reference_run"
+  "workflow": {
+    "code": "space",
+    "inputs": {
+      "method": "" // ???
     },
-    {
-      "job_name": "cupid_runs",
-      "code": "cupid",
-      "inputs": [
-        "subo_cupid_flow",
-        "subo_cupid_grid"
-      ],
-      "restart": false,
-      "workflow": "reference_run"
-    }
-    // {
-    //   "job_name": "hybrid",
-    //   "codes": [
-    //     "space",
-    //     "cupid"
-    //   ],
-    //   "input": "combined",
-    //   "workflow": "reference_run",
-    //   "coupling_method": "auto"
-    // }
-  ],
+    "restart": false,
+    "np": 1
+  },
   "codes": [
     {
       "name": "space",
-      "executable": "codes/space/space.exe",
-      "dependencies": [
-        // "codes/space/waterproperty.dat"
-      ],
-      "artifacts": [
-        ""
-      ],
-      "np": 1
+      "executable": "C:/Users/lambda/Desktop/Moru/bin/code/space/space.exe",
     },
-    {
-      "name": "cupid",
-      "executable": "codes/cupid/cupid.exe",
-      "dependencies": [
-        "codes/cupid/tpfh2o"
-      ],
-      "np": 4
-    }
+    // {
+    //   "name": "cupid",
+    //   "executable": "codes/cupid/cupid.exe",
+    //   "dependencies": [
+    //     "codes/cupid/tpfh2o"
+    //   ]
+    // }
   ],
   "inputs": [
     {
       "name": "subo_space",
-      "file": "input/sample.in"
+      "files": [
+        "C:/Users/lambda/Desktop/Moru/bin/input/sample.in"
+      ]
     },
-    {
-      "name": "subo_cupid_flow",
-      "file": "input/somaFlow.in"
-    },
-    {
-      "name": "subo_cupid_grid",
-      "file": "input/somaGrid.in"
-    }
-  ],
-  "artifacts": [
-    {
-      "name": "subo_space",
-      "file": "input/sample.in"
-    },
-    {
-      "name": "subo_cupid_flow",
-      "file": "input/somaFlow.in"
-    },
-    {
-      "name": "subo_cupid_grid",
-      "file": "input/somaGrid.in"
-    }
+    // {
+    //   "name": "subo_cupid",
+    //   "file": [ "input/somaFlow.in", "input/somaGrid.in" ]
+    // }
   ],
   "samplers": {
-    "seed": "1234",
-    "sample_number": "10",
+    "seed": 1234,
+    "samples": 10,
     "distributions": [
       {
         "name": "uniform_1",
@@ -106,7 +58,18 @@
       {
         "name": "manual_1",
         "distribution": "manual", // should be matched with sampling_number
-        "values": [ 1.0, 1.1, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0 ] // total 10
+        "values": [
+          1.0,
+          1.1,
+          1.3,
+          1.4,
+          1.5,
+          1.6,
+          1.7,
+          1.8,
+          1.9,
+          2.0
+        ] // total 10
       }
     ]
   },
@@ -114,40 +77,57 @@
     {
       "name": "flowrate", // 기존 parameter
       "sampler": "uniform_1",
-      "reference": "subo_space",
+      "base": "subo_space",
       "locations": [
         {
-          "line": "71",
-          "column": "4, 6"
+          "line": 71,
+          "column": 4
         },
         {
-          "line": "72:78",
-          "column": "4"
+          "line": 71,
+          "column": 6
+        },
+        {
+          "line": 72,
+          "column": 4
+        },
+        {
+          "line": 73,
+          "column": 4
+        },
+        {
+          "line": 74,
+          "column": 4
+        },
+        {
+          "line": 75,
+          "column": 4
         }
       ],
       "expression": "*x"
     },
     {
       "name": "dial1", // 기존 parameter
-      "sampler": "uniform_2",
+      "sampler": "manual_1",
       "reference": "subo_space",
       "locations": [
         {
-          "line": "100",
-          "column": "7"
+          "line": 100,
+          "column": 7
         }
       ],
-      "expression": "+(1.7*x)"
+      "expression": "=x"
     }
   ],
   "extractors": [
     {
       "name": "extract_1",
+      "file": "sample_91.dat",
       "locations": [
         {
           "skip_headers": "3",
           "line": "1, 4:10",
-          "column": "1:100"
+          "column": "1:end"
         }
       ]
     }

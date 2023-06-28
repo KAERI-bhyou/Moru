@@ -12,8 +12,8 @@ namespace Moru
     class Input
     {
     public:
-        std::string name;
-        std::filesystem::path file;
+        std::string name_;
+        std::filesystem::path file_;
     };
     inline void to_json( nlohmann::json& json, const Input& input )
     {
@@ -22,10 +22,10 @@ namespace Moru
     inline void from_json( const nlohmann::json& json, Input& input )
     {
         if( json.contains( "name" ) )
-            json.at( "name" ).get_to( input.name );
+            json.at( "name" ).get_to( input.name_ );
 
         if( json.contains( "file" ) )
-            json.at( "file" ).get_to( input.file );
+            json.at( "file" ).get_to( input.file_ );
     }
 } // namespace Moru
 

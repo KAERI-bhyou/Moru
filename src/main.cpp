@@ -27,12 +27,7 @@ int main( int argc, char* argv[] )
         }
         if( args[ i ] == "-h" || args[ i ] == "--help" )
         {
-            std::cout << "" << '\n';
-            std::cout << "" << '\n';
-            std::cout << "" << '\n';
-            std::cout << "" << '\n';
-            std::cout << "" << '\n';
-            std::cout << "" << '\n';
+            std::cout << "Help message." << '\n';
             std::exit( 0 );
         }
     }
@@ -43,7 +38,7 @@ int main( int argc, char* argv[] )
 
     try
     {
-        config_json = nlohmann::json::parse( config_file, nullptr, false, true );
+        config_json = nlohmann::json::parse( config_file, nullptr, true, true );
     }
     catch( nlohmann::json::exception& ec )
     {
@@ -53,19 +48,12 @@ int main( int argc, char* argv[] )
     config_file.close();
     Moru::Config config = config_json;
 
-    spdlog::info( "{}", config_json.dump() );
+    Moru::Worker worker;
+    worker.compile( config );
 
-    int childMessage;
-    MPI_Status status;
-
-    MPI_Comm childComm;
-    MPI_Comm_spawn( "C:/Users/lambda/Desktop/space/bin/space.exe", MPI_ARGV_NULL, 1, MPI_INFO_NULL, 0, MPI_COMM_SELF, &childComm, MPI_ERRCODES_IGNORE );
-    MPI_Recv( &childMessage, 1, MPI_INT, MPI_ANY_SOURCE, MPI_ANY_TAG, childComm, &status );
-    std::cout << "Received message from child process: " << childMessage << std::endl;
-    MPI_Comm_disconnect( &childComm );
+    spdlog::info( "All calculation have been finished." );
 
     MPI_Finalize();
-
 
     return 0;
 }

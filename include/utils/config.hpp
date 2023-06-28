@@ -14,6 +14,9 @@
 #include "components/workflow.hpp"
 
 #include "modules/sampler.hpp"
+#include "modules/generator.hpp"
+
+#include "utils/job.hpp"
 
 namespace Moru
 {
@@ -25,13 +28,44 @@ namespace Moru
         std::string email;
         std::string description;
 
+        Workflow workflow;
+
         std::vector<Code> codes;
         std::vector<Input> inputs;
-        std::vector<Sampler> samplers;
-        std::vector<Workflow> workflows;
-    };
+        Sampler sampler;
+        std::vector<Generator> generators;
 
-    // NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Config, title, author, email, description)
+        Config() = default;
+        ~Config() = default;
+
+        Config( const Config& config )
+            : title{ config.title },
+              author{ config.author },
+              email{ config.email },
+              description{ config.description },
+              workflow{ config.workflow },
+              codes{ config.codes },
+              inputs{ config.inputs },
+              sampler{ config.sampler },
+              generators{ config.generators }
+        {
+            std::cout << "Config( const Config& config )" << std::endl;
+        }
+
+        Config( Config&& config )
+            : title{ config.title },
+              author{ config.author },
+              email{ config.email },
+              description{ config.description },
+              workflow{ config.workflow },
+              codes{ config.codes },
+              inputs{ config.inputs },
+              sampler{ config.sampler },
+              generators{ config.generators }
+        {
+            std::cout << "Config( Config&& config )" << std::endl;
+        }
+    };
 
     inline void to_json( nlohmann::json& j, const Config& config )
     {
@@ -57,8 +91,14 @@ namespace Moru
         if( j.contains( "inputs" ) )
             j.at( "inputs" ).get_to<std::vector<Input>>( config.inputs );
 
-        if( j.contains( "samplers" ) )
-            j.at( "samplers" ).get_to<std::vector<Sampler>>( config.samplers );
+        if( j.contains( "sampler" ) )
+            j.at( "sampler" ).get_to( config.sampler );
+
+        if( j.contains( "generators" ) )
+            j.at( "generators" ).get_to<std::vector<Generator>>( config.generators );
+
+        if( j.contains( "workflow" ) )
+            j.at( "workflow" ).get_to( config.workflow );
     }
 } // namespace Moru
 

@@ -1,0 +1,86 @@
+{
+  "title": "Just Normal Calculation",
+  "author": "Byung-Hyun You",
+  "email": "bhyou@kaeri.re.kr",
+  "description": "Test runs of SUBO experiment for both SPACE and CUPID code.",
+  "workflow": {
+    "name": "Subo_test",
+    "type": "uncertainty_quantification",
+    "code": "space_3.22",
+    "work_dir": "C:/Users/lambda/Desktop/Moru/test"
+  },
+  "codes": [
+    {
+      "name": "space_3.22",
+      "type": "space",
+      "executable": "C:/Users/lambda/Desktop/space/bin/space.exe",
+      "dependencies": [ "C:/Users/lambda/Desktop/space/bin/DCUPID.dll" ]
+    },
+    {
+      "name": "cupid_4449",
+      "type": "cupid",
+      "executable": "C:/Users/lambda/Desktop/cupid/bin/cupid.exe",
+      "dependencies": [ "C:/Users/lambda/Desktop/cupid/bin/tpfh2o" ]
+    }
+  ],
+  "inputs": [
+    {
+      "name": "subo_space",
+      "file": "C:/Users/lambda/Desktop/Moru/bin/input/sample.in"
+    }
+  ],
+  "sampler": {
+    "seed": 1234,
+    "samples": 10,
+    "distributions": [
+      {
+        "name": "uniform_1",
+        "distribution": "uniform",
+        "a": 0.0,
+        "b": 1.0
+      },
+      {
+        "name": "uniform_2",
+        "distribution": "uniform",
+        "a": 1.0,
+        "b": 2.0
+      },
+      {
+        "name": "manual_1",
+        "distribution": "manual", // should be matched with samples
+        "values": [ 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0 ]
+      }
+    ]
+  },
+  "generators": [
+    {
+      "name": "param1", // 기존 parameter
+      "sampler": "uniform_1",
+      "base": "subo_space",
+      "locations": [
+        { "line": 71, "word": 4 },
+        { "line": 71, "word": 5 }
+      ],
+      "expression": "*x"
+    },
+    {
+      "name": "param2", // 기존 parameter
+      "sampler": "uniform_2",
+      "base": "subo_space",
+      "locations": [
+        { "line": 72, "word": 4 }
+      ],
+      "expression": "*x"
+    },
+    {
+      "name": "param3", // 기존 parameter
+      "sampler": "manual_1",
+      "base": "subo_space",
+      "locations": [
+        { "line": 73, "word": 4 },
+        { "line": 73, "word": 5 }
+      ],
+      "expression": "*x"
+    }
+  ]
+}

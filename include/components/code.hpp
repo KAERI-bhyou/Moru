@@ -13,9 +13,9 @@ namespace Moru
     {
     public:
         std::string name;
+        std::string type;
         std::filesystem::path executable;
         std::vector<std::filesystem::path> dependencies;
-        int np;
     };
 
     inline void to_json( nlohmann::json& json, const Code& code )
@@ -27,14 +27,14 @@ namespace Moru
         if( json.contains( "name" ) )
             json.at( "name" ).get_to( code.name );
 
+        if( json.contains( "type" ) )
+            json.at( "type" ).get_to( code.type );
+
         if( json.contains( "executable" ) )
             json.at( "executable" ).get_to( code.executable );
 
         if( json.contains( "dependencies" ) )
             json.at( "dependencies" ).get_to<std::vector<std::filesystem::path>>( code.dependencies );
-
-        if( json.contains( "np" ) )
-            json.at( "np" ).get_to( code.np );
     }
 } // namespace Moru
 

@@ -3,34 +3,37 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
 #include <string>
 #include <vector>
 #include <spdlog/spdlog.h>
 #include <nlohmann/json.hpp>
-#include <mkl.h>
 
+#include <mkl.h>
 namespace Moru
 {
-    enum class Distribution
+    enum class DistributionType
     {
         NORMAL,
         BETA,
         LOGNORMAL,
         UNIFORM,
         WEIBULL,
+        MANUAL,
         NONE,
     };
 
-    class Sampler
+    class Distribution
     {
     public:
-        VSLStreamStatePtr stream_;
-        std::vector<double> elems_;
-        int status_ = 0;
+        std::string name_;
+        DistributionType type_ = DistributionType::NONE;
 
         std::size_t samples_ = 0;
         std::uint64_t seed_ = 0;
-        Distribution dist_ = Distribution::NONE;
+
+        VSLStreamStatePtr stream_;
+        int status_ = 0;
 
         double a_ = 0.0;
         double b_ = 0.0;
@@ -40,8 +43,100 @@ namespace Moru
         double beta_ = 0.0;
         double sigma_ = 0.0;
 
+        std::vector<double> values_;
+
+        // double* values_;
+
+        Distribution() = default;
+        ~Distribution() = default;
+
+        Distribution& operator=( const Distribution& distribution )
+        {
+            name_ = distribution.name_;
+            type_ = distribution.type_;
+            samples_ = distribution.samples_;
+            seed_ = distribution.seed_;
+            stream_ = distribution.stream_;
+            status_ = distribution.status_;
+            a_ = distribution.a_;
+            b_ = distribution.b_;
+            p_ = distribution.p_;
+            q_ = distribution.q_;
+            alpha_ = distribution.alpha_;
+            beta_ = distribution.beta_;
+            sigma_ = distribution.sigma_;
+            values_ = distribution.values_;
+
+            spdlog::debug( "Distribution& operator=( const Distribution& distribution )" );
+
+            return *this;
+        }
+
+        Distribution& operator=( Distribution&& distribution )
+        {
+            name_ = distribution.name_;
+            type_ = distribution.type_;
+            samples_ = distribution.samples_;
+            seed_ = distribution.seed_;
+            stream_ = distribution.stream_;
+            status_ = distribution.status_;
+            a_ = distribution.a_;
+            b_ = distribution.b_;
+            p_ = distribution.p_;
+            q_ = distribution.q_;
+            alpha_ = distribution.alpha_;
+            beta_ = distribution.beta_;
+            sigma_ = distribution.sigma_;
+            values_ = distribution.values_;
+
+            spdlog::debug( "Distribution& operator=( Distribution&& distribution )" );
+
+            return *this;
+        }
+
+        Distribution( const Distribution& distribution )
+            : name_{ distribution.name_ },
+              type_{ distribution.type_ },
+              samples_{ distribution.samples_ },
+              seed_{ distribution.seed_ },
+              stream_{ distribution.stream_ },
+              status_{ distribution.status_ },
+              a_{ distribution.a_ },
+              b_{ distribution.b_ },
+              p_{ distribution.p_ },
+              q_{ distribution.q_ },
+              alpha_{ distribution.alpha_ },
+              beta_{ distribution.beta_ },
+              sigma_{ distribution.sigma_ },
+              values_{ distribution.values_ }
+        {
+            spdlog::debug( "Distribution( const Distribution& distribution )" );
+        }
+
+        Distribution( Distribution&& distribution )
+            : name_{ distribution.name_ },
+              type_{ distribution.type_ },
+              samples_{ distribution.samples_ },
+              seed_{ distribution.seed_ },
+              stream_{ distribution.stream_ },
+              status_{ distribution.status_ },
+              a_{ distribution.a_ },
+              b_{ distribution.b_ },
+              p_{ distribution.p_ },
+              q_{ distribution.q_ },
+              alpha_{ distribution.alpha_ },
+              beta_{ distribution.beta_ },
+              sigma_{ distribution.sigma_ },
+              values_{ distribution.values_ }
+        {
+            spdlog::debug( "Distribution( Distribution&& distribution )" );
+        }
+
         void generate()
         {
+            int status = vslNewStream( &stream_, VSL_BRNG_MT19937, seed_ );
+            values_.resize( samples_ );
+
             if( seed_ == 0 )
             {
                 const auto timestamp = std::chrono::system_clock::now().time_since_epoch().count();
@@ -49,33 +144,69 @@ namespace Moru
                 spdlog::info( "set_rng_seed(): Time-based RNG seed is set to {}", seed_ );
             }
 
-            int status = vslNewStream( &stream_, VSL_BRNG_MT19937, seed_ );
-            elems_.reserve( samples_ );
-
-            switch( dist_ )
+            switch( type_ )
             {
-            case Distribution::NORMAL:
-                status_ = vdRngGaussian( VSL_RNG_METHOD_UNIFORM_STD, stream_, samples_, elems_.data(), a_, sigma_ );
+            case DistributionType::NORMAL:
+                status_ = vdRngGaussian( VSL_RNG_METHOD_UNIFORM_STD, stream_, samples_, values_.data(), a_, sigma_ );
                 break;
 
-            case Distribution::BETA:
-                status_ = vdRngBeta( VSL_RNG_METHOD_UNIFORM_STD, stream_, samples_, elems_.data(), p_, q_, a_, beta_ );
+            case DistributionType::BETA:
+                status_ = vdRngBeta( VSL_RNG_METHOD_UNIFORM_STD, stream_, samples_, values_.data(), p_, q_, a_, beta_ );
                 break;
 
-            case Distribution::LOGNORMAL:
-                status_ = vdRngLognormal( VSL_RNG_METHOD_UNIFORM_STD, stream_, samples_, elems_.data(), a_, sigma_, b_, beta_ );
+            case DistributionType::LOGNORMAL:
+                status_ = vdRngLognormal( VSL_RNG_METHOD_UNIFORM_STD, stream_, samples_, values_.data(), a_, sigma_, b_, beta_ );
                 break;
 
-            case Distribution::UNIFORM:
-                status_ = vdRngUniform( VSL_RNG_METHOD_UNIFORM_STD, stream_, samples_, elems_.data(), a_, b_ );
+            case DistributionType::UNIFORM:
+                status_ = vdRngUniform( VSL_RNG_METHOD_UNIFORM_STD, stream_, samples_, values_.data(), a_, b_ );
                 break;
 
-            case Distribution::WEIBULL:
-                status_ = vdRngWeibull( VSL_RNG_METHOD_UNIFORM_STD, stream_, samples_, elems_.data(), alpha_, a_, beta_ );
+            case DistributionType::WEIBULL:
+                status_ = vdRngWeibull( VSL_RNG_METHOD_UNIFORM_STD, stream_, samples_, values_.data(), alpha_, a_, beta_ );
+                break;
+
+            case DistributionType::MANUAL:
                 break;
 
             default:
                 break;
+            }
+        }
+    };
+
+    class Sampler
+    {
+    public:
+        std::size_t samples_ = 0;
+        std::uint64_t seed_ = 0;
+        std::vector<Distribution> distributions_;
+
+        Sampler() = default;
+        ~Sampler() = default;
+
+        Sampler( const Sampler& sampler )
+            : samples_{ sampler.samples_ },
+              seed_{ sampler.seed_ },
+              distributions_{ sampler.distributions_ }
+        {
+            spdlog::debug( "Sampler( const Sampler& sampler )" );
+        }
+
+        Sampler( Sampler&& sampler )
+            : samples_{ sampler.samples_ },
+              seed_{ sampler.seed_ },
+              distributions_{ sampler.distributions_ }
+        {
+            spdlog::debug( "Sampler( Sampler&& sampler )" );
+        }
+
+        void setup()
+        {
+            for( auto&& distribution : distributions_ )
+            {
+                distribution.samples_ = samples_;
+                distribution.seed_ = seed_;
             }
         }
 
@@ -84,6 +215,60 @@ namespace Moru
             return "";
         };
     };
+
+    inline void to_json( nlohmann::json& j, const Distribution& distribution )
+    {
+    }
+
+    inline void from_json( const nlohmann::json& j, Distribution& distribution )
+    {
+        if( j.contains( "name" ) )
+            j.at( "name" ).get_to( distribution.name_ );
+
+        if( j.contains( "distribution" ) )
+        {
+            std::string dist_str = j.at( "distribution" ).template get<std::string>();
+
+            if( dist_str == "normal" )
+                distribution.type_ = DistributionType::NORMAL;
+            else if( dist_str == "beta" )
+                distribution.type_ = DistributionType::BETA;
+            else if( dist_str == "lognormal" )
+                distribution.type_ = DistributionType::LOGNORMAL;
+            else if( dist_str == "uniform" )
+                distribution.type_ = DistributionType::UNIFORM;
+            else if( dist_str == "weibull" )
+                distribution.type_ = DistributionType::WEIBULL;
+            else if( dist_str == "manual" )
+                distribution.type_ = DistributionType::MANUAL;
+            else
+                spdlog::error( "error" );
+        }
+
+        if( j.contains( "a" ) )
+            j.at( "a" ).get_to( distribution.a_ );
+
+        if( j.contains( "b" ) )
+            j.at( "b" ).get_to( distribution.b_ );
+
+        if( j.contains( "p" ) )
+            j.at( "p" ).get_to( distribution.p_ );
+
+        if( j.contains( "q" ) )
+            j.at( "q" ).get_to( distribution.q_ );
+
+        if( j.contains( "alpha" ) )
+            j.at( "alpha" ).get_to( distribution.alpha_ );
+
+        if( j.contains( "beta" ) )
+            j.at( "beta" ).get_to( distribution.beta_ );
+
+        if( j.contains( "sigma" ) )
+            j.at( "sigma" ).get_to( distribution.sigma_ );
+
+        if( j.contains( "values" ) )
+            j.at( "values" ).get_to( distribution.values_ );
+    }
 
     inline void to_json( nlohmann::json& j, const Sampler& sampler )
     {
@@ -97,44 +282,10 @@ namespace Moru
         if( j.contains( "seed" ) )
             j.at( "seed" ).get_to( sampler.seed_ );
 
-        if( j.contains( "distribution" ) )
-        {
-            std::string dist_str = j.at( "distribution" ).template get<std::string>();
+        if( j.contains( "distributions" ) )
+            j.at( "distributions" ).get_to<std::vector<Distribution>>( sampler.distributions_ );
 
-            if( dist_str.compare( "normal" ) )
-                sampler.dist_ = Distribution::NORMAL;
-            else if( dist_str.compare( "beta" ) )
-                sampler.dist_ = Distribution::BETA;
-            else if( dist_str.compare( "lognormal" ) )
-                sampler.dist_ = Distribution::LOGNORMAL;
-            else if( dist_str.compare( "uniform" ) )
-                sampler.dist_ = Distribution::UNIFORM;
-            else if( dist_str.compare( "weibull" ) )
-                sampler.dist_ = Distribution::WEIBULL;
-            else
-                spdlog::error( "error" );
-        }
-
-        if( j.contains( "a" ) )
-            j.at( "a" ).get_to( sampler.a_ );
-
-        if( j.contains( "b" ) )
-            j.at( "b" ).get_to( sampler.b_ );
-
-        if( j.contains( "p" ) )
-            j.at( "p" ).get_to( sampler.p_ );
-
-        if( j.contains( "q" ) )
-            j.at( "q" ).get_to( sampler.q_ );
-
-        if( j.contains( "alpha" ) )
-            j.at( "alpha" ).get_to( sampler.alpha_ );
-
-        if( j.contains( "beta" ) )
-            j.at( "beta" ).get_to( sampler.beta_ );
-
-        if( j.contains( "sigma" ) )
-            j.at( "sigma" ).get_to( sampler.sigma_ );
+        sampler.setup();
     }
 } // namespace Moru
 
