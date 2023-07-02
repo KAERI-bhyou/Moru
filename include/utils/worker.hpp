@@ -11,6 +11,7 @@
 #include <oneapi/tbb/parallel_for_each.h>
 #include <oneapi/tbb/task_arena.h>
 #include <oneapi/tbb/task_group.h>
+#include <oneapi/tbb/concurrent_queue.h>
 
 #include "modules/sampler.hpp"
 #include "utils/config.hpp"
@@ -21,7 +22,10 @@ namespace Moru
     class Worker
     {
     public:
-        std::vector<Job> jobs;
+        oneapi::tbb::concurrent_queue<Job> jobs;
+
+    private:
+        oneapi::tbb::task_group task_;
 
     public:
         void uncertainty_quantification( Config& config )
@@ -62,19 +66,20 @@ namespace Moru
 
                 Job job( i, config.codes[ 0 ], config.inputs, working_dir );
                 job.prefare();
-                jobs.push_back( job );
+                jobs.push( job );
             }
         }
 
         void execute()
         {
-            std::for_each(
-                std::execution::seq,
-                std::begin( jobs ), std::end( jobs ),
-                []( Job& job )
-                {
-                    job.run();
-                } );
+            while( !jobs.empty() )
+            {
+                Job job;
+                jobs.try_pop( job );
+                task_.run( [ & ]()
+                           { job.run(); } );
+            }
+            task_.wait();
         }
 
         void compile( Config& config )

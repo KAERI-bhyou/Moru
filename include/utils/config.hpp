@@ -34,37 +34,6 @@ namespace Moru
         std::vector<Input> inputs;
         Sampler sampler;
         std::vector<Generator> generators;
-
-        Config() = default;
-        ~Config() = default;
-
-        Config( const Config& config )
-            : title{ config.title },
-              author{ config.author },
-              email{ config.email },
-              description{ config.description },
-              workflow{ config.workflow },
-              codes{ config.codes },
-              inputs{ config.inputs },
-              sampler{ config.sampler },
-              generators{ config.generators }
-        {
-            std::cout << "Config( const Config& config )" << std::endl;
-        }
-
-        Config( Config&& config )
-            : title{ config.title },
-              author{ config.author },
-              email{ config.email },
-              description{ config.description },
-              workflow{ config.workflow },
-              codes{ config.codes },
-              inputs{ config.inputs },
-              sampler{ config.sampler },
-              generators{ config.generators }
-        {
-            std::cout << "Config( Config&& config )" << std::endl;
-        }
     };
 
     inline void to_json( nlohmann::json& j, const Config& config )

@@ -8,10 +8,12 @@
 #include <vector>
 #include <filesystem>
 #include <fstream>
+#include <regex>
 
 #include <fmt/format.h>
 #include <spdlog/spdlog.h>
 #include <nlohmann/json.hpp>
+#include <exprtk.hpp>
 
 #include "components/input.hpp"
 #include "modules/sampler.hpp"
@@ -38,6 +40,30 @@ namespace Moru
         Distribution distribution_;
 
     private:
+        double func( double& old_value, double& random_value )
+        {
+            using SymbolTable = exprtk::symbol_table<double>;
+            using Expression = exprtk::expression<double>;
+            using Parser = exprtk::parser<double>;
+
+            auto expression = "o" + expression_;
+
+            SymbolTable symbol_table;
+            symbol_table.add_constants();
+            symbol_table.add_variable( "o", old_value );
+            symbol_table.add_variable( "x", random_value );
+
+            Expression expression_object;
+            expression_object.register_symbol_table( symbol_table );
+
+            Parser parser;
+            parser.compile( expression, expression_object );
+
+            double new_value = expression_object.value();
+
+            return new_value;
+        }
+
         std::string replace()
         {
             std::ifstream f( base_input_.file_, std::ios::in | std::ios::binary );
@@ -47,7 +73,10 @@ namespace Moru
 
             while( std::getline( f, line ) )
             {
-                spdlog::info( "[{}] {}", line_number, line );
+                std::regex wordRegex( "\\b\\w+\\b" );
+                std::sregex_iterator wordIter( line.begin(), line.end(), wordRegex );
+                std::sregex_iterator endIter;
+
 
                 result_string.append( line );
                 line_number++;

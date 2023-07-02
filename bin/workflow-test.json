@@ -26,7 +26,7 @@
   "inputs": [
     {
       "name": "subo_space",
-      "file": "C:/Users/lambda/Desktop/Moru/bin/input/sample.in"
+      "file": "C:/Users/lambda/Desktop/space/bin/sample.in"
     }
   ],
   "sampler": {
@@ -81,6 +81,14 @@
         { "line": 73, "word": 5 }
       ],
       "expression": "*x"
+    }
+  ],
+  "extractors": [
+    {
+      "name": "extract_1",
+      "file": "subo_sample.dat",
+      "skip": 3,
+      "ranges": { "x": "end", "y": "2,4,5,6:8" }
     }
   ]
 }

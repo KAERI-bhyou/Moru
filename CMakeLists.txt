@@ -7,6 +7,7 @@ project(
 set(target "moru")
 
 include(cmake/CompileOptions.cmake)
+include(cmake/Definitions.cmake)
 include(cmake/Dependencies.cmake)
 include(cmake/SourceLists.cmake)
 include(cmake/Tests.cmake)
@@ -28,7 +29,7 @@ target_include_directories(
 target_compile_definitions(
     ${target}
         PRIVATE
-            _WIN32_WINNT=0x0601
+            ${MORU_DEFINITIONS}
 )
 target_link_directories(
     ${target}

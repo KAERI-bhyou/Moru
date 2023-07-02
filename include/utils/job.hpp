@@ -4,6 +4,8 @@
 #include <filesystem>
 #include <iostream>
 #include <vector>
+#include <chrono>
+#include <thread>
 
 #include <mpi.h>
 
@@ -30,35 +32,12 @@ namespace Moru
         std::vector<int> errors_;
 
     private:
-        oneapi::tbb::task_group task_;
-
     public:
-        Job() = delete;
-        Job& operator=( Job&& job )
+        Job()
         {
-            spdlog::debug( "Job& operator=( Job&& )" );
-            return *this;
         }
-        Job& operator=( const Job& job )
+        ~Job()
         {
-            spdlog::debug( "Job& operator=( const Job& job )" );
-            return *this;
-        }
-
-        Job( const Job& job )
-            : id_{ job.id_ },
-              code_{ job.code_ },
-              inputs_{ job.inputs_ },
-              working_dir_{ job.working_dir_ },
-              comm_{ job.comm_ },
-              info_{ job.info_ },
-              status_{ job.status_ },
-              np_{ job.np_ },
-              argv_{ job.argv_ },
-              message_{ job.message_ },
-              errors_{ job.errors_ }
-        { // 만들어야함
-            spdlog::debug( "Job( const Job& job )" );
         }
 
         Job( Job&& job )
@@ -74,7 +53,55 @@ namespace Moru
               message_{ job.message_ },
               errors_{ job.errors_ }
         {
-            spdlog::debug( "Job( Job&& job)" );
+        }
+
+        Job( const Job& job )
+            : id_{ job.id_ },
+              code_{ job.code_ },
+              inputs_{ job.inputs_ },
+              working_dir_{ job.working_dir_ },
+              comm_{ job.comm_ },
+              info_{ job.info_ },
+              status_{ job.status_ },
+              np_{ job.np_ },
+              argv_{ job.argv_ },
+              message_{ job.message_ },
+              errors_{ job.errors_ }
+        {
+        }
+
+        Job& operator=( Job&& job )
+        {
+            id_ = job.id_;
+            code_ = job.code_;
+            inputs_ = job.inputs_;
+            working_dir_ = job.working_dir_;
+            comm_ = job.comm_;
+            info_ = job.info_;
+            status_ = job.status_;
+            np_ = job.np_;
+            argv_ = job.argv_;
+            message_ = job.message_;
+            errors_ = job.errors_;
+
+            return *this;
+        }
+
+        Job& operator=( const Job& job )
+        {
+            id_ = job.id_;
+            code_ = job.code_;
+            inputs_ = job.inputs_;
+            working_dir_ = job.working_dir_;
+            comm_ = job.comm_;
+            info_ = job.info_;
+            status_ = job.status_;
+            np_ = job.np_;
+            argv_ = job.argv_;
+            message_ = job.message_;
+            errors_ = job.errors_;
+
+            return *this;
         }
 
         Job( int id, const Code& code, const std::vector<Input>& inputs, const std::filesystem::path& working_dir )
@@ -134,7 +161,8 @@ namespace Moru
             }
             argv_char_[ argv_.size() ] = nullptr;
 
-            MPI_Comm_spawn( command.string().c_str(), argv_char_, np_, info_, 0, MPI_COMM_SELF, &comm_, errors_.data() );
+            // std::this_thread::sleep_for( std::chrono::milliseconds( 1000 ) );
+            MPI_Comm_spawn( command.string().c_str(), argv_char_, np_, info_, 0, MPI_COMM_WORLD, &comm_, errors_.data() );
             MPI_Recv( &message_, 1, MPI_INT, MPI_ANY_SOURCE, MPI_ANY_TAG, comm_, &status_ );
             MPI_Comm_disconnect( &comm_ );
             spdlog::info( "Received value {}/42 from {}", message_, comm_ );

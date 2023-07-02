@@ -30,7 +30,7 @@ namespace Moru
         DistributionType type_ = DistributionType::NONE;
 
         std::size_t samples_ = 0;
-        std::uint64_t seed_ = 0;
+        std::uint32_t seed_ = 0;
 
         VSLStreamStatePtr stream_;
         int status_ = 0;
@@ -45,96 +45,11 @@ namespace Moru
 
         std::vector<double> values_;
 
-        // double* values_;
-
-        Distribution() = default;
-        ~Distribution() = default;
-
-        Distribution& operator=( const Distribution& distribution )
-        {
-            name_ = distribution.name_;
-            type_ = distribution.type_;
-            samples_ = distribution.samples_;
-            seed_ = distribution.seed_;
-            stream_ = distribution.stream_;
-            status_ = distribution.status_;
-            a_ = distribution.a_;
-            b_ = distribution.b_;
-            p_ = distribution.p_;
-            q_ = distribution.q_;
-            alpha_ = distribution.alpha_;
-            beta_ = distribution.beta_;
-            sigma_ = distribution.sigma_;
-            values_ = distribution.values_;
-
-            spdlog::debug( "Distribution& operator=( const Distribution& distribution )" );
-
-            return *this;
-        }
-
-        Distribution& operator=( Distribution&& distribution )
-        {
-            name_ = distribution.name_;
-            type_ = distribution.type_;
-            samples_ = distribution.samples_;
-            seed_ = distribution.seed_;
-            stream_ = distribution.stream_;
-            status_ = distribution.status_;
-            a_ = distribution.a_;
-            b_ = distribution.b_;
-            p_ = distribution.p_;
-            q_ = distribution.q_;
-            alpha_ = distribution.alpha_;
-            beta_ = distribution.beta_;
-            sigma_ = distribution.sigma_;
-            values_ = distribution.values_;
-
-            spdlog::debug( "Distribution& operator=( Distribution&& distribution )" );
-
-            return *this;
-        }
-
-        Distribution( const Distribution& distribution )
-            : name_{ distribution.name_ },
-              type_{ distribution.type_ },
-              samples_{ distribution.samples_ },
-              seed_{ distribution.seed_ },
-              stream_{ distribution.stream_ },
-              status_{ distribution.status_ },
-              a_{ distribution.a_ },
-              b_{ distribution.b_ },
-              p_{ distribution.p_ },
-              q_{ distribution.q_ },
-              alpha_{ distribution.alpha_ },
-              beta_{ distribution.beta_ },
-              sigma_{ distribution.sigma_ },
-              values_{ distribution.values_ }
-        {
-            spdlog::debug( "Distribution( const Distribution& distribution )" );
-        }
-
-        Distribution( Distribution&& distribution )
-            : name_{ distribution.name_ },
-              type_{ distribution.type_ },
-              samples_{ distribution.samples_ },
-              seed_{ distribution.seed_ },
-              stream_{ distribution.stream_ },
-              status_{ distribution.status_ },
-              a_{ distribution.a_ },
-              b_{ distribution.b_ },
-              p_{ distribution.p_ },
-              q_{ distribution.q_ },
-              alpha_{ distribution.alpha_ },
-              beta_{ distribution.beta_ },
-              sigma_{ distribution.sigma_ },
-              values_{ distribution.values_ }
-        {
-            spdlog::debug( "Distribution( Distribution&& distribution )" );
-        }
-
         void generate()
         {
-            int status = vslNewStream( &stream_, VSL_BRNG_MT19937, seed_ );
+            // int status = vslNewStream( &stream_, VSL_BRNG_PHILOX4X32X10, seed_ );
+            int status = vslNewStreamEx( &stream_, VSL_BRNG_PHILOX4X32X10, 2, &seed_ );
+
             values_.resize( samples_ );
 
             if( seed_ == 0 )
@@ -159,7 +74,7 @@ namespace Moru
                 break;
 
             case DistributionType::UNIFORM:
-                status_ = vdRngUniform( VSL_RNG_METHOD_UNIFORM_STD, stream_, samples_, values_.data(), a_, b_ );
+                status_ = vdRngUniform( VSL_RNG_METHOD_UNIFORM_STD_ACCURATE, stream_, samples_, values_.data(), a_, b_ );
                 break;
 
             case DistributionType::WEIBULL:
